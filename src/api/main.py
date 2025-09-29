@@ -1,13 +1,6 @@
 from fastapi import FastAPI
 from . import routes
 
-from starlette.middleware.wsgi import WSGIMiddleware
-import dash
-from dash import dcc, html
-import plotly.express as px
-import pandas as pd
-
-
 app = FastAPI(title="Real-Time Data API")
 
 app.include_router(routes.router)

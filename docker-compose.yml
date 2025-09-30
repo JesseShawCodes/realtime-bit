@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:15
@@ -13,6 +11,27 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+  
+  api:
+    build: ./src
+    container_name: fastapi_app
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://realtime_user:realtime_pass@db:5432/realtime_db
+    ports:
+     - "8000:8000"
+    volumes:
+     - "./src:/app"
+
+  dashboard:
+    build: ./data-pipeline
+    container_name: dashboard_app
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+
 
 volumes:
   pgdata:

@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import routes
+# FIX: Start the import from the top-level package 'app'
+from app.api.endpoints import routes
 
 app = FastAPI(title="Real-Time Data API")
 
-app.include_router(routes.router)
+# If routes.py exports 'router', this line is correct
+app.include_router(routes.router) 
 
 origins = [
     "http://localhost:3000",

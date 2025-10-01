@@ -2,8 +2,10 @@ from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 import statistics
 
-from src.db import SessionLocal
-from src.data.models import Price
+# from src.db import SessionLocal
+#from src.data.models import Price
+from ..db.db import SessionLocal
+from ..models.models import Price
 
 # Simple in-memory history for demo purposes
 _price_history: Dict[str, List[float]] = {
@@ -50,7 +52,7 @@ def compute_metrics() -> Dict[str, Dict[str, float]]:
       "max": max(prices),
       "moving_avg": round(statistics.mean(prices), 2)
     }
-    return metrics
+  return metrics
 
 def save_to_db(normalized):
   """

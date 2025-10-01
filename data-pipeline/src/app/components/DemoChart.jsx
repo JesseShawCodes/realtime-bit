@@ -10,7 +10,7 @@ export default function DemoChart() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch('http://127.0.0.1:8001/data/history?limit=100');
+      const res = await fetch('http://127.0.0.1:8000/data/history?limit=100');
       const json = await res.json();
       
       const bitcoinData = json.filter(d => d.asset === 'bitcoin').map(d => ({ x: d.timestamp, y: d.price }));

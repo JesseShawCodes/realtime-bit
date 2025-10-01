@@ -25,10 +25,15 @@ services:
      - "./src:/app"
 
   dashboard:
-    build: ./data-pipeline
     container_name: dashboard_app
     depends_on:
       - api
+    environment:
+      NEXT_PUBLIC_NAME: value
+    build:
+      context: ./data-pipeline
+      args:
+        NEXT_PUBLIC_NAME: value
     ports:
       - "3000:3000"
 

@@ -3,6 +3,7 @@ aiohttp==3.12.15
 aiosignal==1.4.0
 annotated-types==0.7.0
 anyio==4.11.0
+asyncio
 async-timeout==5.0.1
 attrs==25.3.0
 click==8.3.0

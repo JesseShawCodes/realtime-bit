@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./App.scss";
+
+import React from 'react';
+import NavBar from "./components/NavBar";
+// import { ThemeProvider } from "./context/ThemeContext";
+import Footer from "./components/Footer";
+import BootstrapClient from "./components/BootstrapClient";
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -14,10 +21,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`antialiased`}
-      >
-        {children}
+      <body>
+
+            <div className="d-flex flex-column min-vh-100">
+              <NavBar />
+              <main className="flex-grow-1  bg-gradient-my-gradient">
+                {children}
+              </main>
+              <Footer />
+            </div>
+        <BootstrapClient />
+        <div id="modal-root"></div>
       </body>
     </html>
   );

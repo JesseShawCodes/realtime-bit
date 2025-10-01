@@ -3,11 +3,10 @@ import asyncio
 import logging
 from typing import Any, Dict, Optional
 
-from src.data.models import Price
-from src.db import get_db
+from app.models.models import Price
+from app.db.db import get_db
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("uvicorn.error") # Use the Uvicorn logger for integration
 
 API_URL = "https://api.coingecko.com/api/v3/simple/price"
 PARAMS = {"ids": "bitcoin,ethereum", "vs_currencies": "usd"}
@@ -40,17 +39,25 @@ def save_prices(data: dict, db_session):
     db_session.add(price)
   db_session.commit()
 
-async def poll_prices(interval: int = 10):
+async def poll_prices(interval: int = 30): # Increased interval for safety/rate limits
+  logger.info(f"Starting price polling with interval: {interval} seconds")
   while True:
-    data = await fetch_prices()
-    if data:
-      logger.info(f"Fetched Data: {data}")
-      db_session = _get_db_session()
-      save_prices(data, db_session)
-      db_session.close()
+    try:
+      data = await fetch_prices()
+      if data:
+        logger.debug(f"Fetched Data: {data}")
+        db_session = _get_db_session()
+        # Ensure your database connection setup is correct and handles pooling/cleanup
+        try:
+          save_prices(data, db_session)
+        finally:
+          db_session.close()
+    except asyncio.CancelledError:
+        logger.info("Polling task cancelled.")
+        break
+    except Exception as e:
+        logger.error(f"Error in poll_prices loop: {e}")
+        
     await asyncio.sleep(interval)
 
-if __name__ == "__main__":
-  # result = asyncio.run(fetch_prices())
-  # print(result)
-  asyncio.run(poll_prices())
+# Remove the `if __name__ == "__main__":` block.

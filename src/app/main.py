@@ -1,12 +1,36 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-# FIX: Start the import from the top-level package 'app'
+import asyncio
 from app.api.endpoints import routes
+from app.data.fetcher import poll_prices 
+import logging
+logger = logging.getLogger("uvicorn.error") # Use the Uvicorn logger for integration
+
 
 app = FastAPI(title="Real-Time Data API")
 
-# If routes.py exports 'router', this line is correct
+# Global variable to hold the background task
+background_task = None
+
+# --- Startup Event Handlers ---
+
+@app.on_event("startup")
+async def start_polling():
+    """Starts the continuous background task (poll_prices)."""
+    global background_task
+    # Create the task without blocking the startup process
+    background_task = asyncio.create_task(poll_prices(interval=30)) 
+    logger.info("Background price polling task started.")
+
+@app.on_event("shutdown")
+async def stop_polling():
+    """Stops the continuous background task when the server shuts down."""
+    if background_task:
+        background_task.cancel()
+        logger.info("Background price polling task stopped.")
+
+# --- Middleware and Router Setup ---
+
 app.include_router(routes.router) 
 
 origins = [
@@ -26,7 +50,3 @@ app.add_middleware(
 @app.get("/")
 async def read_root():
   return {"message": "Hello, FastAPI!"}
-
-@app.get("/items/{item_id}")
-async def read_item(item_id: int, q: str = None):
-  return {"item_id": item_id, "q": q}

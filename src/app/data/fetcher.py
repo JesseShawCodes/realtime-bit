@@ -39,25 +39,21 @@ def save_prices(data: dict, db_session):
     db_session.add(price)
   db_session.commit()
 
-async def poll_prices(interval: int = 30): # Increased interval for safety/rate limits
-  logger.info(f"Starting price polling with interval: {interval} seconds")
-  while True:
+async def poll_prices(interval: int = 30):
+    """Continuously polls for prices and saves them to the database."""
+    logger.info(f"Starting price polling every {interval} seconds.")
+    db_session = _get_db_session()
     try:
-      data = await fetch_prices()
-      if data:
-        logger.debug(f"Fetched Data: {data}")
-        db_session = _get_db_session()
-        # Ensure your database connection setup is correct and handles pooling/cleanup
-        try:
-          save_prices(data, db_session)
-        finally:
-          db_session.close()
+        while True:
+            data = await fetch_prices()
+            if data:
+                logger.debug(f"Fetched data: {data}")
+                save_prices(data, db_session)
+            await asyncio.sleep(interval)
     except asyncio.CancelledError:
-        logger.info("Polling task cancelled.")
-        break
+        logger.info("Polling task was cancelled.")
     except Exception as e:
-        logger.error(f"Error in poll_prices loop: {e}")
-        
-    await asyncio.sleep(interval)
-
-# Remove the `if __name__ == "__main__":` block.
+        logger.error(f"An unexpected error occurred in the polling loop: {e}")
+    finally:
+        db_session.close()
+        logger.info("Database session closed.")

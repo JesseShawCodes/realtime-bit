@@ -23,19 +23,29 @@ services:
      - "8000:8000"
     volumes:
      - "./src:/app"
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app
 
   dashboard:
     container_name: dashboard_app
     depends_on:
       - api
-    environment:
-      NEXT_PUBLIC_NAME: value
     build:
-      context: ./data-pipeline
+      context: ./data-pipeline-frontend
+      dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_NAME: value
     ports:
       - "3000:3000"
+    volumes:
+      - ./data-pipeline-frontend:/app
+      - /app/node_modules
+    environment:
+      - WATCHPACK_POLLING=true
+    command: "npm run dev"
 
 
 volumes:

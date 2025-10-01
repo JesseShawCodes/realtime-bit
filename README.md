@@ -1,6 +1,16 @@
-To start fast api
+# Real Time Data App
+
+Application can be started up using Dokcer
+
+```
+docker-compose up
+```
+
+## Other useful commands
+
+To start fast api from src
 '''
-uvicorn src.api.main:app --reload --port 8001
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload      
 '''
 
 To initialize Database

@@ -54,7 +54,7 @@ def compute_metrics() -> Dict[str, Dict[str, float]]:
     }
   return metrics
 
-def save_to_db(normalized):
+def save_to_db(normalized: List[Dict[str, Any]]) -> None:
   """
   Save normalized data to postgresql
   """
@@ -78,7 +78,7 @@ if __name__ == "__main__":
   from fetcher import fetch_prices
   import asyncio
 
-  async def demo():
+  async def demo() -> None:
     raw = await fetch_prices()
     normalized = normalize(raw)
     update_history(normalized)
